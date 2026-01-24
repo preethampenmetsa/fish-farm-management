@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Sampling</title>
+</head>
+<body>
+    <h2>Add Fish Sampling (Batch Input)</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Preview Sampling</button>
+    </form>
+</body>
+</html>

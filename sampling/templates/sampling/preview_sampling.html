@@ -1,0 +1,16 @@
+<h2>Confirm Sampling</h2>
+
+<p><strong>Total fish count:</strong> {{ preview.sample_fish_count }}</p>
+<p><strong>Total weight:</strong> {{ preview.sample_total_weight }} g</p>
+<p><strong>Average weight:</strong> {{ preview.average_weight }} g</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" name="edit">Go back and edit</button>
+    <button type="submit" name="confirm">Confirm & Save</button>
+</form>
+
+</form>
+
+<a href="/sampling/add/">Go back and edit</a>
