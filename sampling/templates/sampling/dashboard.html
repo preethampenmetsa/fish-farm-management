@@ -1,67 +1,54 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Fish Sampling Dashboard</title>
-    <style>
-        body { font-family: Arial; margin: 30px; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        th { background: #f4f4f4; }
+{% extends "base.html" %}
 
-        .GOOD { color: green; font-weight: bold; }
-        .AVERAGE { color: orange; font-weight: bold; }
-        .POOR { color: red; font-weight: bold; }
-        .NO\ DATA { color: gray; font-weight: bold; }
+{% block title %}Fish Sampling Dashboard{% endblock %}
 
-        .pagination { margin-top: 20px; }
-        .pagination a { margin: 0 5px; text-decoration: none; }
-    </style>
-</head>
-<body>
+{% block content %}
 
 <h2>🐟 Fish Sampling Dashboard</h2>
 
-<table>
-    <tr>
-        <th>Pond / Stock</th>
-        <th>Date</th>
-        <th>Fish Count</th>
-        <th>Total Weight</th>
-        <th>Avg Weight</th>
-        <th>Growth</th>
-        <th>Status</th>
-    </tr>
-
-    {% for sampling in page_obj %}
-    <tr>
-        <td>{{ sampling.fish_stock }}</td>
-        <td>{{ sampling.sampled_on }}</td>
-        <td>{{ sampling.sample_fish_count }}</td>
-        <td>{{ sampling.sample_total_weight }}</td>
-        <td>{{ sampling.average_weight }}</td>
-        <td>{{ sampling.growth_from_previous }}</td>
-        <td class="{{ sampling.growth_status }}">
-            {{ sampling.growth_status }}
-        </td>
-    </tr>
-    {% empty %}
-    <tr>
-        <td colspan="7">No samplings found</td>
-    </tr>
-    {% endfor %}
+<table border="1" cellpadding="8" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Pond / Stock</th>
+            <th>Date</th>
+            <th>Fish Count</th>
+            <th>Total Weight</th>
+            <th>Avg Weight</th>
+            <th>Growth</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for sampling in page_obj %}
+        <tr>
+            <td>{{ sampling.fish_stock }}</td>
+            <td>{{ sampling.sampled_on }}</td>
+            <td>{{ sampling.sample_fish_count }}</td>
+            <td>{{ sampling.sample_total_weight }}</td>
+            <td>{{ sampling.average_weight }}</td>
+            <td>{{ sampling.growth_from_previous }}</td>
+            <td>{{ sampling.growth_status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No samplings found</td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 
-<div class="pagination">
+<br>
+
+<div>
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">⬅ Prev</a>
+        <a href="?page={{ page_obj.previous_page_number }}">← Prev</a>
     {% endif %}
 
     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next ➡</a>
+        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
     {% endif %}
 </div>
 
-</body>
-</html>
+{% endblock %}

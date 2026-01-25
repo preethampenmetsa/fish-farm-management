@@ -5,5 +5,4 @@ urlpatterns = [
     path("add/", add_sampling, name="add-sampling"),
     path("success/", sampling_success, name="sampling-success"),
     path("dashboard/", sampling_dashboard, name="sampling-dashboard"),
-    path("accounts/", include("django.contrib.auth.urls")),
 ]

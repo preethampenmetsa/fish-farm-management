@@ -3,6 +3,7 @@ from django.db import models
 from django.forms import ValidationError
 from core.models import Pond, FishSpecies
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import User
 
 class PondFishStock(models.Model):
     pond = models.ForeignKey(
@@ -82,6 +83,11 @@ class PondFishStock(models.Model):
 
 
 class FishSampling(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="fish_samplings"
+    )
     fish_stock = models.ForeignKey(
         PondFishStock,
         on_delete=models.CASCADE,

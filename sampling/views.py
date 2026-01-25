@@ -4,6 +4,7 @@ from sampling.forms import SamplingForm
 from sampling.models import FishSampling
 from sampling.services import create_sampling_from_batches
 from django.core.paginator import Paginator
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -55,6 +56,7 @@ def add_sampling(request):
 def sampling_success(request):
     return render(request, "sampling/success.html")
 
+@login_required
 def sampling_dashboard(request):
     samplings = (
         FishSampling.objects
