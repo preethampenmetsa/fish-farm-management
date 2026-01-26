@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Your Ponds</h2>
+
+<a href="{% url 'create-pond' %}">Add Pond</a>
+
+<ul>
+  {% for pond in ponds %}
+    <li>{{ pond.name }} — {{ pond.area_acres }} acres</li>
+  {% empty %}
+    <li>No ponds created yet</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,15 +1,10 @@
 from django.db import models
-
-class Farmer(models.Model):
-    name = models.CharField(max_length=100)
-    location = models.CharField(max_length=150, blank=True)
-
-    def __str__(self):
-        return self.name
+from django.contrib.auth.models import User
+from django.conf import settings
 
 class Pond(models.Model):
-    farmer = models.ForeignKey(
-        Farmer,
+    user = models.ForeignKey(
+        User,
         on_delete=models.CASCADE,
         related_name="ponds"
     )
@@ -19,9 +14,27 @@ class Pond(models.Model):
     def __str__(self):
         return f"{self.name} ({self.area_acres} acres)"
 
-
 class FishSpecies(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=100)
+
+    # NULL = global species, set = user-specific
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="custom_species"
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["name", "user"],
+                name="unique_species_per_user"
+            )
+        ]
 
     def __str__(self):
-        return self.name
+        if self.user:
+            return f"{self.name} (custom)"
+        return f"{self.name} (default)"

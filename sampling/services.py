@@ -3,6 +3,7 @@ from sampling.models import FishSampling
 
 
 def create_sampling_from_batches(
+    user,
     fish_stock,
     sampled_on,
     batch_size,
@@ -11,6 +12,7 @@ def create_sampling_from_batches(
     result = calculate_sampling_from_batches(batch_size, batches)
 
     sampling = FishSampling.objects.create(
+        user=user,
         fish_stock=fish_stock,
         sampled_on=sampled_on,
         sample_fish_count=result["sample_fish_count"],
@@ -19,10 +21,13 @@ def create_sampling_from_batches(
 
     return sampling
 
+from sampling.models import FishSampling
+
 def calculate_growth(current_sampling):
     previous_sampling = (
         FishSampling.objects
         .filter(
+            user=current_sampling.user,              # ✅ CRITICAL
             fish_stock=current_sampling.fish_stock,
             sampled_on__lt=current_sampling.sampled_on
         )
@@ -34,7 +39,7 @@ def calculate_growth(current_sampling):
         return {
             "growth_from_previous": None,
             "growth_percentage": None,
-            "growth_status": "NO DATA"
+            "growth_status": "NO DATA",
         }
 
     diff = current_sampling.average_weight - previous_sampling.average_weight
@@ -50,8 +55,9 @@ def calculate_growth(current_sampling):
     return {
         "growth_from_previous": round(diff, 2),
         "growth_percentage": round(percentage, 2),
-        "growth_status": status
+        "growth_status": status,
     }
+
 
 
 

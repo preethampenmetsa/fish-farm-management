@@ -16,11 +16,14 @@ class FishSamplingAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = (
-        "average_weight_display",
-        "growth_from_previous_display",
-        "growth_percentage_display",
-        "growth_status",
-    )
+    "sample_fish_count",
+    "sample_total_weight",
+    "average_weight",
+    "growth_from_previous",
+    "growth_percentage",
+    "growth_status",
+)
+
 
     def average_weight_display(self, obj):
         return obj.average_weight

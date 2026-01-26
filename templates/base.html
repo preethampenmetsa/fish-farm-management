@@ -1,28 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Fish Farm{% endblock %}</title>
+  <title>Fish Farm</title>
 </head>
 <body>
 
 {% if user.is_authenticated %}
-    <header style="margin-bottom: 20px;">
-        <span>Logged in as <strong>{{ user.username }}</strong></span>
+  <div style="padding:10px; border-bottom:1px solid #ccc;">
+    Logged in as <strong>{{ user.username }}</strong> |
 
-        <form
-            method="post"
-            action="{% url 'logout' %}"
-            style="display:inline;"
-        >
-            {% csrf_token %}
-            <button type="submit">Logout</button>
-        </form>
-    </header>
+    <a href="{% url 'home' %}">Home</a> |
+    <a href="{% url 'pond-list' %}">Ponds</a> |
+    <a href="{% url 'sampling-dashboard' %}">Dashboard</a> |
+    <a href="{% url 'add-sampling' %}">Add Sampling</a> |
+    <a href="{% url 'add-pond-stock' %}">Add Pond Stock</a> |
+    <a href="{% url 'species-list' %}">Species</a> |
+
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit">Logout</button>
+    </form>
+  </div>
 {% endif %}
 
-<hr>
-
-{% block content %}{% endblock %}
+<!-- 🔥 THIS WAS MISSING 🔥 -->
+<div style="padding:20px;">
+  {% block content %}{% endblock %}
+</div>
 
 </body>
 </html>

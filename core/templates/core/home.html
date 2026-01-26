@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Fish Farm Dashboard</h2>
+
+<p>Welcome {{ request.user.username }}</p>
+
+<ul>
+  <li><a href="{% url 'pond-list' %}">My Ponds</a></li>
+  <li><a href="{% url 'sampling-dashboard' %}">Sampling Dashboard</a></li>
+  <li><a href="{% url 'add-sampling' %}">Add Sampling</a></li>
+</ul>
+{% endblock %}
