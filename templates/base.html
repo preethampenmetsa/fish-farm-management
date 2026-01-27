@@ -15,6 +15,7 @@
     <a href="{% url 'add-sampling' %}">Add Sampling</a> |
     <a href="{% url 'add-pond-stock' %}">Add Pond Stock</a> |
     <a href="{% url 'species-list' %}">Species</a> |
+    <a href="{% url 'pond-stock-list' %}">Pond Stock</a> |
 
     <form method="post" action="{% url 'logout' %}" style="display:inline;">
       {% csrf_token %}

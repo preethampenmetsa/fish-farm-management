@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Pond Stock</h2>
+
+<a href="{% url 'add-pond-stock' %}">Add Pond Stock</a>
+
+<ul>
+  {% for stock in stocks %}
+    <li>
+      {{ stock.pond.name }} —
+      {{ stock.stocked_on}} —
+      Status: {{ stock.status }} —
+      {{ stock.species.name }} —
+      Qty: {{ stock.quantity }} —
+      Avg wt: {{ stock.initial_avg_weight }}
+
+      {% if stock.status == "ACTIVE" %}
+        <form
+          method="post"
+          action="{% url 'close-pond-stock' stock.id %}"
+          style="display:inline;"
+        >
+          {% csrf_token %}
+          <button type="submit">Close Stock</button>
+        </form>
+      {% endif %}
+
+      {% with latest=stock.latest_sampling %}
+        {% if latest %}
+            <br>
+            🧪 Last sampled:
+            {{ latest.sampled_on }} |
+            Count: {{ latest.sample_fish_count }} |
+            Avg wt:
+            {{ latest.sample_total_weight|floatformat:2 }}g
+        {% else %}
+            <br>🧪 No sampling yet
+        {% endif %}
+    {% endwith %}
+
+    </li>
+  {% empty %}
+    <li>No pond stock added yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,15 +1,43 @@
 {% extends "base.html" %}
 
-{% block title %}Fish Sampling Dashboard{% endblock %}
+{% block title %}Sampling Dashboard{% endblock %}
 
 {% block content %}
+<h2>Fish Sampling Dashboard</h2>
 
-<h2>🐟 Fish Sampling Dashboard</h2>
+<form method="get" style="margin-bottom: 20px;">
+    <label>Pond:</label>
+    <select name="pond">
+        <option value="">All</option>
+        {% for p in ponds %}
+            <option value="{{ p.pond__id }}"
+                {% if selected_pond == p.pond__id|stringformat:"s" %}selected{% endif %}
+            >
+                {{ p.pond__name }}
+            </option>
+        {% endfor %}
+    </select>
 
-<table border="1" cellpadding="8" cellspacing="0" width="100%">
+    <label>Stock:</label>
+    <select name="stock">
+        <option value="">All</option>
+        {% for s in stocks %}
+            <option value="{{ s.id }}"
+                {% if selected_stock == s.id|stringformat:"s" %}selected{% endif %}
+            >
+                {{ s.species.name }} ({{ s.pond.name }})
+            </option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Filter</button>
+</form>
+
+<table border="1" cellpadding="8" width="100%">
     <thead>
         <tr>
-            <th>Pond / Stock</th>
+            <th>Pond</th>
+            <th>Species</th>
             <th>Date</th>
             <th>Fish Count</th>
             <th>Total Weight</th>
@@ -21,34 +49,32 @@
     <tbody>
         {% for sampling in page_obj %}
         <tr>
-            <td>{{ sampling.fish_stock }}</td>
+            <td>{{ sampling.fish_stock.pond.name }}</td>
+            <td>{{ sampling.fish_stock.species.name }}</td>
             <td>{{ sampling.sampled_on }}</td>
             <td>{{ sampling.sample_fish_count }}</td>
             <td>{{ sampling.sample_total_weight }}</td>
-            <td>{{ sampling.average_weight }}</td>
+            <td>{{ sampling.sample_average_weight }}</td>
             <td>{{ sampling.growth_from_previous }}</td>
             <td>{{ sampling.growth_status }}</td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="7">No samplings found</td>
+            <td colspan="8">No samplings found</td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
 
-<br>
-
-<div>
+<div style="margin-top: 10px;">
     {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}">← Prev</a>
+        <a href="?page={{ page_obj.previous_page_number }}">Prev</a>
     {% endif %}
 
     Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
 
     {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}">Next →</a>
+        <a href="?page={{ page_obj.next_page_number }}">Next</a>
     {% endif %}
 </div>
-
 {% endblock %}

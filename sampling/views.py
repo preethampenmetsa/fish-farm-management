@@ -1,10 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from calculator.utils import calculate_sampling_from_batches
 from sampling.forms import SamplingForm, PondStockForm
-from sampling.models import FishSampling
+from sampling.models import FishSampling, PondFishStock
 from sampling.services import create_sampling_from_batches
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 def add_sampling(request):
     if request.method == "POST":
@@ -80,20 +81,71 @@ def add_pond_stock(request):
     )
 
 @login_required
+def close_pond_stock(request, stock_id):
+    stock = get_object_or_404(
+        PondFishStock,
+        id=stock_id,
+        user=request.user,
+        status=PondFishStock.ACTIVE
+    )
+
+    stock.status = PondFishStock.CLOSED
+    stock.closed_on = timezone.now().date()
+    stock.save()
+
+    return redirect("pond-stock-list")
+
+# -------------------------
+# Sampling Dashboard (FILTERED)
+# -------------------------
+@login_required
 def sampling_dashboard(request):
+    pond_id = request.GET.get("pond")
+    stock_id = request.GET.get("stock")
+
     samplings = (
         FishSampling.objects
         .filter(user=request.user)
-        .select_related("fish_stock")
+        .select_related("fish_stock", "fish_stock__pond", "fish_stock__species")
         .order_by("-sampled_on")
     )
 
-    paginator = Paginator(samplings, 10)  # 10 per page
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+    if stock_id:
+        samplings = samplings.filter(fish_stock_id=stock_id)
+    elif pond_id:
+        samplings = samplings.filter(fish_stock__pond_id=pond_id)
+
+    paginator = Paginator(samplings, 10)
+    page_obj = paginator.get_page(request.GET.get("page"))
+
+    ponds = PondFishStock.objects.filter(
+        user=request.user,
+        status=PondFishStock.ACTIVE
+    ).values("pond__id", "pond__name").distinct()
+
+    stocks = PondFishStock.objects.filter(
+        user=request.user,
+        status=PondFishStock.ACTIVE
+    )
 
     return render(
         request,
         "sampling/dashboard.html",
-        {"page_obj": page_obj}
+        {
+            "page_obj": page_obj,
+            "ponds": ponds,
+            "stocks": stocks,
+            "selected_pond": pond_id,
+            "selected_stock": stock_id,
+        },
+    )
+
+@login_required
+def pond_stock_list(request):
+    stocks = PondFishStock.objects.filter(user=request.user)
+
+    return render(
+        request,
+        "sampling/pond_stock_list.html",
+        {"stocks": stocks}
     )

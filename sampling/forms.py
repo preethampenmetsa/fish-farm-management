@@ -1,6 +1,8 @@
 from django import forms
+from core.models import FishSpecies
 from sampling.models import PondFishStock, FishSampling, Pond
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 class SamplingForm(forms.Form):
 
@@ -109,3 +111,7 @@ class PondStockForm(forms.ModelForm):
 
         # 🔒 Ownership filtering
         self.fields["pond"].queryset = Pond.objects.filter(user=self.user)
+
+        self.fields["species"].queryset = FishSpecies.objects.filter(
+            Q(user__isnull=True) | Q(user=self.user)
+        ).order_by("name")

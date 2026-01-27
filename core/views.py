@@ -4,7 +4,6 @@ from core.forms import FishSpeciesForm, PondForm
 from core.models import FishSpecies, Pond
 from django.db.models import Q
 
-
 @login_required
 def home(request):
     return render(request, "core/home.html")
