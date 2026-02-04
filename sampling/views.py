@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from calculator.utils import calculate_sampling_from_batches
+from core.models import Pond
 from sampling.forms import SamplingForm, PondStockForm
 from sampling.models import FishSampling, PondFishStock
 from sampling.services import create_sampling_from_batches
@@ -106,27 +107,35 @@ def sampling_dashboard(request):
     samplings = (
         FishSampling.objects
         .filter(user=request.user)
-        .select_related("fish_stock", "fish_stock__pond", "fish_stock__species")
+        .select_related(
+            "fish_stock",
+            "fish_stock__pond",
+            "fish_stock__species"
+        )
         .order_by("-sampled_on")
     )
 
+    # Apply filters in correct priority
+    if pond_id:
+        samplings = samplings.filter(fish_stock__pond_id=pond_id)
+
     if stock_id:
         samplings = samplings.filter(fish_stock_id=stock_id)
-    elif pond_id:
-        samplings = samplings.filter(fish_stock__pond_id=pond_id)
 
     paginator = Paginator(samplings, 10)
     page_obj = paginator.get_page(request.GET.get("page"))
 
-    ponds = PondFishStock.objects.filter(
-        user=request.user,
-        status=PondFishStock.ACTIVE
-    ).values("pond__id", "pond__name").distinct()
+    # ✅ Ponds for dropdown
+    ponds = Pond.objects.filter(user=request.user)
 
+    # ✅ Stocks filtered by selected pond
     stocks = PondFishStock.objects.filter(
         user=request.user,
         status=PondFishStock.ACTIVE
     )
+
+    if pond_id:
+        stocks = stocks.filter(pond_id=pond_id)
 
     return render(
         request,
@@ -137,7 +146,7 @@ def sampling_dashboard(request):
             "stocks": stocks,
             "selected_pond": pond_id,
             "selected_stock": stock_id,
-        },
+        }
     )
 
 @login_required

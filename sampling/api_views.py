@@ -1,7 +1,12 @@
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from sampling.models import FishSampling
+from .models import PondFishStock
+from .api_serializers import PondFishStockSerializer
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from sampling.api_serializers import (
     FishSamplingSerializer,
     FishSamplingCreateSerializer,
@@ -51,4 +56,36 @@ class FishSamplingCreateAPI(CreateAPIView):
         return Response(
             response_serializer.data,
             status=status.HTTP_201_CREATED
+        )
+
+
+class PondStockListCreateAPI(ListCreateAPIView):
+    serializer_class = PondFishStockSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return PondFishStock.objects.filter(
+            user=self.request.user,
+            status=PondFishStock.ACTIVE
+        ).select_related("pond", "species")
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+    
+class PondStockCloseAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        try:
+            stock = PondFishStock.objects.get(pk=pk, user=request.user)
+        except PondFishStock.DoesNotExist:
+            return Response(
+                {"error": "Stock not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        stock.close()  # uses your model method
+        return Response(
+            {"message": "Stock closed successfully"},
+            status=status.HTTP_200_OK
         )

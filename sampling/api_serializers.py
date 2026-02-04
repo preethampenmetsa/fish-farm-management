@@ -3,16 +3,53 @@ from rest_framework import serializers
 from sampling.models import FishSampling, PondFishStock
 from sampling.services import create_sampling_from_batches
 
-
 class PondFishStockSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
+    pond_name = serializers.CharField(source="pond.name", read_only=True)
+    species_name = serializers.CharField(source="species.name", read_only=True)
 
     class Meta:
         model = PondFishStock
-        fields = ["id", "display_name"]
+        fields = [
+            "display_name",
+            "id",
+            "pond",
+            "pond_name",
+            "species",
+            "species_name",
+            "quantity",
+            "initial_avg_weight",
+            "stocked_on",
+            "status",
+        ]
+        read_only_fields = ["status"]
 
     def get_display_name(self, obj):
         return str(obj)
+    
+    def validate(self, attrs):
+        request = self.context.get("request")
+        user = request.user if request else None
+
+        pond = attrs.get("pond")
+        species = attrs.get("species")
+
+        if not user or not pond or not species:
+            return attrs
+
+        exists = PondFishStock.objects.filter(
+            user=user,
+            pond=pond,
+            species=species,
+            status=PondFishStock.ACTIVE
+        ).exists()
+
+        if exists:
+            raise serializers.ValidationError(
+                "An active stock for this species already exists in this pond."
+            )
+
+        return attrs
 
 
 class FishSamplingSerializer(serializers.ModelSerializer):

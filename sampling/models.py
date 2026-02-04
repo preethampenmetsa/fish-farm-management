@@ -200,9 +200,19 @@ class FishSampling(models.Model):
     @property
     def growth_from_previous(self):
         previous = self.previous_sampling
-        if not previous or not previous.average_weight:
-            return None
-        return self.average_weight - previous.average_weight
+        initial_avg = self.fish_stock.initial_avg_weight
+        if previous and previous.average_weight is not None:
+            return round(
+            self.average_weight - previous.average_weight,
+            2
+        )
+        # initial_avg = self.fish_stock.initial_avg_weight
+        elif  initial_avg is not None:
+            return round(
+                    self.average_weight - initial_avg,
+                    2
+                )
+        return None
 
     @property
     def days_since_previous(self):
@@ -214,11 +224,25 @@ class FishSampling(models.Model):
     @property
     def growth_percentage(self):
         previous = self.previous_sampling
-        if not previous or not previous.average_weight:
+
+        # Case 1: Compare with previous sampling
+        if previous and previous.average_weight is not None:
+            base = previous.average_weight
+
+        # Case 2: First sampling → compare with initial stock
+        elif self.fish_stock.initial_avg_weight is not None:
+            base = self.fish_stock.initial_avg_weight
+
+        # Case 3: No baseline
+        else:
             return None
 
-        growth = self.average_weight - previous.average_weight
-        return round((growth / previous.average_weight) * Decimal("100"), 2)
+        growth = self.average_weight - base
+
+        return round(
+            (growth / base) * Decimal("100"),
+            2
+        )
 
     @property
     def growth_status(self):
