@@ -38,6 +38,83 @@
     });
 </script>
 
+{% if page_obj.paginator.count < 2 %}
+  <p style="text-align:center; color:#666;">
+    Growth trend will appear after multiple samplings.
+  </p>
+{% endif %}
+
+{% if is_single_pond %}
+    <div style="max-width: 900px; margin: 20px auto;">
+        <canvas id="weightChart" height="220"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    const rawData = JSON.parse('{{ graph_data_json|escapejs }}');
+
+    // If no data, do nothing
+    if (Object.keys(rawData).length === 0) {
+        console.warn("No graph data available");
+    } else {
+        const datasets = [];
+        const colors = ["#2563eb", "#16a34a", "#dc2626", "#9333ea", "#ea580c"];
+        let colorIndex = 0;
+
+        for (const species in rawData) {
+            datasets.push({
+                label: species,
+                data: rawData[species].map(p => ({
+                x: p.day,
+                y: p.avg_weight
+                })),
+                borderColor: colors[colorIndex % colors.length],
+                backgroundColor: colors[colorIndex % colors.length],
+                pointRadius: 6,
+                pointHoverRadius: 8,
+                showLine: true,
+                tension: 0.4,
+                fill: false
+            });
+            colorIndex++;
+        }
+
+        const labels = rawData[Object.keys(rawData)[0]].map(p => p.day);
+
+        const ctx = document.getElementById("weightChart").getContext("2d");
+
+        new Chart(ctx, {
+        type: "line",
+        data: { datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+            x: {
+                type: "linear",
+                min: 0,
+                title: {
+                    display: true,
+                    text: "Days Since Stocking"
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: "Average Weight (g)"
+                }
+            }
+            }
+        }
+    });
+    }
+    </script>
+{% else %}
+  <p style="text-align:center; color:gray;">
+    Select a pond to view its growth trend.
+  </p>
+{% endif %}
 
 <table border="1" cellpadding="8" width="100%">
     <thead>

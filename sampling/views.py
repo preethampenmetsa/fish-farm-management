@@ -7,6 +7,8 @@ from sampling.services import create_sampling_from_batches
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from collections import defaultdict
+import json
 
 def add_sampling(request):
     if request.method == "POST":
@@ -137,6 +139,28 @@ def sampling_dashboard(request):
     if pond_id:
         stocks = stocks.filter(pond_id=pond_id)
 
+    all_samplings = (
+        samplings
+        .select_related("fish_stock")
+        .order_by("sampled_on")
+    )
+    graph_data = defaultdict(list)
+
+    for s in all_samplings:
+        stock = s.fish_stock
+
+    # Safety check (important)
+        if not stock.stocked_on:
+            continue
+        days_since_stocked = (s.sampled_on - stock.stocked_on).days
+        species_name = s.fish_stock.species.name
+        graph_data[species_name].append({
+            "day": days_since_stocked,
+            "avg_weight": float(s.average_weight),
+        })
+    is_single_pond = bool(pond_id)
+    graph_data_json = json.dumps(graph_data)
+
     return render(
         request,
         "sampling/dashboard.html",
@@ -146,6 +170,8 @@ def sampling_dashboard(request):
             "stocks": stocks,
             "selected_pond": pond_id,
             "selected_stock": stock_id,
+            "graph_data_json": graph_data_json,
+            "is_single_pond": is_single_pond,
         }
     )
 
