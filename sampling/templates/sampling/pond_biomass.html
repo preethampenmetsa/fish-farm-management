@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block content %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sampling/biomass.css' %}">
+{% endblock %}
+
+<h2>Pond Biomass Dashboard</h2>
+
+<form method="get">
+  <label>Select Pond:</label>
+  <select name="pond_id" onchange="this.form.submit()">
+    <option value="">-- Select Pond --</option>
+    {% for pond in ponds %}
+      <option value="{{ pond.id }}"
+        {% if selected_pond and pond.id == selected_pond.id %}selected{% endif %}>
+        {{ pond.name }}
+      </option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if biomass %}
+<hr>
+<div class="dashboard-grid">
+
+    <div class="card">
+        <h3>Total Alive Fish</h3>
+        <p class="big-number">
+            {{ biomass.total_alive_fish|intcomma }}
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Total Pond Biomass</h3>
+        <p class="big-number">
+            {{ biomass.total_biomass|floatformat:0|intcomma }} g
+        </p>
+        <p class="sub-number">
+            ({{ biomass.total_biomass_tons }} tons)
+        </p>
+    </div>
+
+</div>
+
+<h3 style="margin-top:30px;">Species Distribution</h3>
+
+<div class="species-grid">
+{% for species, data in biomass.species_data.items %}
+    <div class="card">
+        <h4>{{ species }}</h4>
+
+        <p>
+            <strong>Alive:</strong>
+            {{ data.alive_fish|intcomma }}
+        </p>
+
+        <p>
+            <strong>Biomass:</strong><br>
+            {{ data.total_weight|floatformat:0|intcomma }} g<br>
+            <span class="sub-number">
+                ({{ data.total_weight_tons }} tons)
+            </span>
+        </p>
+    </div>
+{% endfor %}
+</div>
+
+{% endif %}
+
+{% endblock %}

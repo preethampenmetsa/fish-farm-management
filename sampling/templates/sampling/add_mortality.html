@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Add Mortality{% endblock %}
+
+{% block content %}
+<h2>Log Dead Fish</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+{% endblock %}

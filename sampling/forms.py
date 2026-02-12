@@ -1,6 +1,6 @@
 from django import forms
 from core.models import FishSpecies
-from sampling.models import PondFishStock, FishSampling, Pond
+from sampling.models import FishMortality, PondFishStock, FishSampling, Pond
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
@@ -115,3 +115,26 @@ class PondStockForm(forms.ModelForm):
         self.fields["species"].queryset = FishSpecies.objects.filter(
             Q(user__isnull=True) | Q(user=self.user)
         ).order_by("name")
+
+class FishMortalityForm(forms.ModelForm):
+    class Meta:
+        model = FishMortality
+        fields = ["fish_stock", 
+                  "date", 
+                  "dead_count", 
+                  "note"
+                  ]
+        widgets = {
+            "date": forms.DateInput(attrs={"type": "date"}),
+            "note": forms.Textarea
+
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if user:
+            self.fields["fish_stock"].queryset = PondFishStock.objects.filter(
+                user=user,
+                status=PondFishStock.ACTIVE
+            )

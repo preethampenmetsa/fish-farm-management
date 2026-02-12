@@ -3,6 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from core.models import Pond, FishSpecies
+from django.db.models import Sum
 
 class PondFishStock(models.Model):
     ACTIVE = "ACTIVE"
@@ -118,6 +119,28 @@ class PondFishStock(models.Model):
             return "AVERAGE"
         else:
             return "POOR"
+    
+    @property
+    def total_dead_fish(self):
+        return (
+            self.mortalities.aggregate(
+                total=Sum("dead_count")
+            )["total"] or 0
+        )
+    
+    @property
+    def alive_fish_count(self):
+        alive = self.quantity - self.total_dead_fish
+        return max(alive, 0)
+    
+    @property
+    def latest_average_weight(self):
+        latest = self.latest_sampling()
+        return float(latest.average_weight) if latest else self.initial_avg_weight
+    
+    @property
+    def total_live_weight(self):
+        return self.alive_fish_count * self.latest_average_weight
 
     def __str__(self):
         return f"{self.species.name} in {self.pond.name} ({self.status})"
@@ -259,3 +282,15 @@ class FishSampling(models.Model):
 
     def __str__(self):
         return f"Sampling on {self.sampled_on}"
+    
+class FishMortality(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    fish_stock = models.ForeignKey(PondFishStock, on_delete=models.CASCADE, related_name="mortalities")
+    date = models.DateField()
+    dead_count = models.PositiveIntegerField()
+    note = models.CharField(max_length=255, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.fish_stock} - {self.dead_count} dead"

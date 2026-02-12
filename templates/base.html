@@ -2,6 +2,7 @@
 <html>
 <head>
   <title>Fish Farm</title>
+  {% block extra_css %}{% endblock %}
 </head>
 <body>
 
@@ -16,6 +17,8 @@
     <a href="{% url 'add-pond-stock' %}">Add Pond Stock</a> |
     <a href="{% url 'species-list' %}">Species</a> |
     <a href="{% url 'pond-stock-list' %}">Pond Stock</a> |
+    <a href="{% url 'add-mortality' %}">Add Mortality</a> |
+    <a href="{% url 'pond_biomass' %}">Biomass Dashboard</a> |
 
     <form method="post" action="{% url 'logout' %}" style="display:inline;">
       {% csrf_token %}

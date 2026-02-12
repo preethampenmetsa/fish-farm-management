@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from calculator.utils import calculate_sampling_from_batches
 from core.models import Pond
-from sampling.forms import SamplingForm, PondStockForm
+from sampling.forms import FishMortalityForm, SamplingForm, PondStockForm
 from sampling.models import FishSampling, PondFishStock
-from sampling.services import create_sampling_from_batches
+from sampling.services import create_sampling_from_batches, get_single_pond_biomass
 from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -145,15 +145,27 @@ def sampling_dashboard(request):
         .order_by("sampled_on")
     )
     graph_data = defaultdict(list)
+    seen_stocks = set()
 
     for s in all_samplings:
         stock = s.fish_stock
 
-    # Safety check (important)
         if not stock.stocked_on:
             continue
+
+        species_name = stock.species.name
+        stock_key = stock.id  # important to avoid duplicates
+
+        # ✅ Add stocking-day average ONCE per stock
+        if stock_key not in seen_stocks:
+            graph_data[species_name].append({
+                "day": 0,
+                "avg_weight": float(stock.initial_avg_weight),
+            })
+            seen_stocks.add(stock_key)
+
         days_since_stocked = (s.sampled_on - stock.stocked_on).days
-        species_name = s.fish_stock.species.name
+
         graph_data[species_name].append({
             "day": days_since_stocked,
             "avg_weight": float(s.average_weight),
@@ -184,3 +196,53 @@ def pond_stock_list(request):
         "sampling/pond_stock_list.html",
         {"stocks": stocks}
     )
+
+@login_required
+def add_mortality(request):
+    if request.method == "POST":
+        form = FishMortalityForm(request.POST, user=request.user)
+        if form.is_valid():
+            mortality = form.save(commit=False)
+            mortality.user = request.user
+            mortality.save()
+            return redirect("sampling-dashboard")
+    else:
+        form = FishMortalityForm(user=request.user)
+
+    return render(
+        request,
+        "sampling/add_mortality.html",
+        {"form": form}
+    )
+
+@login_required
+def pond_biomass_view(request):
+    ponds = Pond.objects.filter(user=request.user)
+    selected_pond = None
+    biomass_data = None
+
+    pond_id = request.GET.get("pond_id")
+
+    if pond_id:
+        selected_pond = ponds.filter(id=pond_id).first()
+        if selected_pond:
+            biomass_data = get_single_pond_biomass(selected_pond)
+        if biomass_data:
+            # Convert total pond biomass to tonnes
+            biomass_data["total_biomass_tons"] = round(
+                biomass_data["total_biomass"] / 1_000_000, 2
+            )
+
+            # Convert species biomass to tonnes
+            for species in biomass_data["species_data"].values():
+                species["total_weight_tons"] = round(
+                    species["total_weight"] / 1_000_000, 2
+                )
+    context = {
+        "ponds": ponds,
+        "selected_pond": selected_pond,
+        "biomass": biomass_data,
+    }
+
+    return render(request, "sampling/pond_biomass.html", context)
+

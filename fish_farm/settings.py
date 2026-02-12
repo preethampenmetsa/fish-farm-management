@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'django.contrib.humanize',
 
     'core',
     'sampling',
@@ -131,5 +132,7 @@ REST_FRAMEWORK = {
 LOGIN_REDIRECT_URL = "/sampling/dashboard/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 LOGIN_URL = "/accounts/login/"
+STATIC_URL = "static/"
+
 
 
