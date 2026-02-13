@@ -91,6 +91,7 @@ def get_single_pond_biomass(pond):
     species_data = defaultdict(lambda: {
         "alive_fish": 0,
         "total_weight": 0,
+        "current_avg_weight": 0,
     })
 
     for stock in stocks:
@@ -112,6 +113,7 @@ def get_single_pond_biomass(pond):
         species = species_data[stock.species.name]
         species["alive_fish"] += alive
         species["total_weight"] += biomass
+        species["current_avg_weight"] = avg_weight
 
     return {
     "total_alive_fish": total_alive,

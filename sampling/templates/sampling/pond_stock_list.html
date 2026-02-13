@@ -1,47 +1,68 @@
 {% extends "base.html" %}
+{% load static %}
+{% load humanize %}
 
 {% block content %}
-<h2>Pond Stock</h2>
+{% load static %}
+<link rel="stylesheet" href="{% static 'sampling/pond_stock_list.css' %}">
 
-<a href="{% url 'add-pond-stock' %}">Add Pond Stock</a>
+<div class="stock-container">
+    <h2>Pond Stock</h2>
 
-<ul>
-  {% for stock in stocks %}
-    <li>
-      {{ stock.pond.name }} —
-      {{ stock.stocked_on}} —
-      Status: {{ stock.status }} —
-      {{ stock.species.name }} —
-      Qty: {{ stock.quantity }} —
-      Avg wt: {{ stock.initial_avg_weight }}
+    <a href="{% url 'add-pond-stock' %}">+ Add Pond Stock</a>
 
-      {% if stock.status == "ACTIVE" %}
-        <form
-          method="post"
-          action="{% url 'close-pond-stock' stock.id %}"
-          style="display:inline;"
-        >
-          {% csrf_token %}
-          <button type="submit">Close Stock</button>
-        </form>
-      {% endif %}
+    <div class="stock-grid">
 
-      {% with latest=stock.latest_sampling %}
-        {% if latest %}
-            <br>
-            🧪 Last sampled:
-            {{ latest.sampled_on }} |
-            Count: {{ latest.sample_fish_count }} |
-            Avg wt:
-            {{ latest.sample_total_weight|floatformat:2 }}g
-        {% else %}
-            <br>🧪 No sampling yet
-        {% endif %}
-    {% endwith %}
+        {% for stock in stocks %}
+        <div class="stock-card">
 
-    </li>
-  {% empty %}
-    <li>No pond stock added yet.</li>
-  {% endfor %}
-</ul>
+            <div class="stock-header">
+                <div class="stock-title">
+                    {{ stock.pond.name }} — {{ stock.species.name }}
+                </div>
+
+                <div class="status-badge 
+                    {% if stock.status == 'ACTIVE' %}
+                        status-active
+                    {% else %}
+                        status-closed
+                    {% endif %}
+                ">
+                    {{ stock.status }}
+                </div>
+            </div>
+
+            <div class="stock-details">
+                <strong>Stocked On:</strong> {{ stock.stocked_on }} <br>
+                <strong>Quantity:</strong> {{ stock.quantity|intcomma }} <br>
+                <strong>Initial Avg Weight:</strong> {{ stock.initial_avg_weight }} g
+            </div>
+
+            {% with latest=stock.latest_sampling %}
+            <div class="sampling-info">
+                {% if latest %}
+                    <strong>Last Sampling:</strong> {{ latest.sampled_on }} <br>
+                    Count: {{ latest.sample_fish_count }} <br>
+                    Avg Weight: {{ latest.average_weight }} g
+                {% else %}
+                    No sampling yet
+                {% endif %}
+            </div>
+            {% endwith %}
+
+            {% if stock.status == "ACTIVE" %}
+            <form method="post" action="{% url 'close-pond-stock' stock.id %}">
+                {% csrf_token %}
+                <button type="submit" class="close-btn">Close Stock</button>
+            </form>
+            {% endif %}
+
+        </div>
+        {% empty %}
+            <p>No pond stock added yet.</p>
+        {% endfor %}
+
+    </div>
+</div>
+
 {% endblock %}

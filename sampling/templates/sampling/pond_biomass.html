@@ -53,6 +53,11 @@
         <h4>{{ species }}</h4>
 
         <p>
+            <strong>Average Weight:</strong>
+            {{ data.current_avg_weight|floatformat:0|intcomma }} g
+        </p>
+
+        <p>
             <strong>Alive:</strong>
             {{ data.alive_fish|intcomma }}
         </p>
