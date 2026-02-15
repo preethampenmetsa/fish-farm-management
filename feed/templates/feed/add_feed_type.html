@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Add Feed Type{% endblock %}
+
+{% block content %}
+<h2>Add Feed Type</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+
+<a href="{% url 'feed:feed-type-list' %}">Back to Feed Types</a>
+
+{% endblock %}

@@ -6,6 +6,11 @@
 
 <h2>Add Fish Sampling (Batch Input)</h2>
 
+<div class="sampling-nav">
+    <a href="{% url 'sampling:sampling-dashboard' %}">Dashboard</a>
+    <a href="{% url 'sampling:add-sampling' %}">Add Sampling</a>
+</div>
+
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

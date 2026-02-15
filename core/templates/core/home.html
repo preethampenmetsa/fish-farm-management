@@ -1,13 +1,31 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Home | Fish Farm
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/home.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>Fish Farm Dashboard</h2>
+<h2>Farm Overview</h2>
 
-<p>Welcome {{ request.user.username }}</p>
+{% if pond_data %}
+    {% for item in pond_data %}
+        <div class="pond-card">
+            <h3>
+                <a href="{% url 'pond-detail' item.pond.id %}">
+                    {{ item.pond.name }}
+                </a>
+            </h3>
+            <p>Active Stocks: {{ item.active_stock_count }}</p>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You have no ponds yet.</p>
+    <a href="{% url 'create-pond' %}" class="btn">Add Pond</a>
+{% endif %}
 
-<ul>
-  <li><a href="{% url 'pond-list' %}">My Ponds</a></li>
-  <li><a href="{% url 'sampling-dashboard' %}">Sampling Dashboard</a></li>
-  <li><a href="{% url 'add-sampling' %}">Add Sampling</a></li>
-</ul>
 {% endblock %}

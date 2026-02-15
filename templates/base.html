@@ -1,35 +1,36 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
 <head>
-  <title>Fish Farm</title>
-  {% block extra_css %}{% endblock %}
+    <title>{% block title %}Fish Farm{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}
+    {% endblock %}
 </head>
+
 <body>
 
 {% if user.is_authenticated %}
-  <div style="padding:10px; border-bottom:1px solid #ccc;">
+<div class="navbar">
     Logged in as <strong>{{ user.username }}</strong> |
 
-    <a href="{% url 'home' %}">Home</a> |
-    <a href="{% url 'pond-list' %}">Ponds</a> |
-    <a href="{% url 'sampling-dashboard' %}">Dashboard</a> |
-    <a href="{% url 'add-sampling' %}">Add Sampling</a> |
-    <a href="{% url 'add-pond-stock' %}">Add Pond Stock</a> |
-    <a href="{% url 'species-list' %}">Species</a> |
-    <a href="{% url 'pond-stock-list' %}">Pond Stock</a> |
-    <a href="{% url 'add-mortality' %}">Add Mortality</a> |
-    <a href="{% url 'pond_biomass' %}">Biomass Dashboard</a> |
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'pond-list' %}">My Ponds</a>
+    <a href="{% url 'species-list' %}">Species</a>
+    <a href="{% url 'feed:feed-type-list' %}">Feed Types</a>
 
-    <form method="post" action="{% url 'logout' %}" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit">Logout</button>
+    <form method="post"
+          action="{% url 'logout' %}"
+          style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
     </form>
-  </div>
+</div>
 {% endif %}
 
-<!-- 🔥 THIS WAS MISSING 🔥 -->
-<div style="padding:20px;">
-  {% block content %}{% endblock %}
+<div class="content">
+    {% block content %}
+    {% endblock %}
 </div>
 
 </body>

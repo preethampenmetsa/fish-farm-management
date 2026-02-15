@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ pond.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/pond_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="pond-header card">
+    <h2>{{ pond.name }}</h2>
+    <p><strong>Area:</strong> {{ pond.area_acres }} acres</p>
+</div>
+
+<div class="section-title">
+    <h3>Manage Pond</h3>
+</div>
+
+<div class="action-grid">
+    <a class="action-card" href="{% url 'stock:pond-stock-list' %}?pond_id={{ pond.id }}">
+        <h4>Stocks</h4>
+        <p>View and manage active stocks</p>
+    </a>
+
+    <a class="action-card" href="{% url 'stock:pond-biomass' %}?pond_id={{ pond.id }}">
+        <h4>Biomass</h4>
+        <p>Check total biomass and stock weight</p>
+    </a>
+
+    <a class="action-card" href="{% url 'sampling:sampling-dashboard' %}?pond={{ pond.id }}">
+        <h4>Sampling</h4>
+        <p>Track growth trends and sampling logs</p>
+    </a>
+
+    <a class="action-card" href="{% url 'mortality:add-mortality' %}?pond_id={{ pond.id }}">
+        <h4>Add Mortality</h4>
+        <p>Log dead fish entries</p>
+    </a>
+
+    <a class="action-card" href="{% url 'mortality:mortality-logs' %}?pond_id={{ pond.id }}">
+        <h4>Mortality Logs</h4>
+        <p>View recorded mortality history</p>
+    </a>
+</div>
+
+{% endblock %}

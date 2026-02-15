@@ -1,9 +1,18 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}Sampling Dashboard{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'sampling/sampling.css' %}">
+{% endblock %}
 
 {% block content %}
 <h2>Fish Sampling Dashboard</h2>
+
+<div class="sampling-nav">
+    <a href="{% url 'sampling:sampling-dashboard' %}">Dashboard</a>
+    <a href="{% url 'sampling:add-sampling' %}">Add Sampling</a>
+</div>
 
 <form method="get" id="filter-form" style="margin-bottom: 20px;">
     <label>Pond:</label>
@@ -45,8 +54,8 @@
 {% endif %}
 
 {% if is_single_pond %}
-    <div style="max-width: 900px; margin: 20px auto;">
-        <canvas id="weightChart" height="220"></canvas>
+    <div class="chart-wrapper">
+        <canvas id="weightChart"></canvas>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -54,10 +63,7 @@
     <script>
     const rawData = JSON.parse('{{ graph_data_json|escapejs }}');
 
-    // If no data, do nothing
-    if (Object.keys(rawData).length === 0) {
-        console.warn("No graph data available");
-    } else {
+    if (Object.keys(rawData).length > 0) {
         const datasets = [];
         const colors = ["#2563eb", "#16a34a", "#dc2626", "#9333ea", "#ea580c"];
         let colorIndex = 0;
@@ -65,51 +71,47 @@
         for (const species in rawData) {
             datasets.push({
                 label: species,
-                data: rawData[species].map(p => ({
-                x: p.day,
-                y: p.avg_weight
+                data: rawData[species].sort((a,b)=>a.day-b.day).map(p => ({
+                    x: p.day,
+                    y: p.avg_weight
                 })),
                 borderColor: colors[colorIndex % colors.length],
                 backgroundColor: colors[colorIndex % colors.length],
+                tension: 0.3,
                 pointRadius: 6,
-                pointHoverRadius: 8,
-                showLine: true,
-                tension: 0.4,
                 fill: false
             });
             colorIndex++;
         }
 
-        const labels = rawData[Object.keys(rawData)[0]].map(p => p.day);
-
         const ctx = document.getElementById("weightChart").getContext("2d");
 
         new Chart(ctx, {
-        type: "line",
-        data: { datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-            x: {
-                type: "linear",
-                min: 0,
-                title: {
-                    display: true,
-                    text: "Days Since Stocking"
-                }
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: "Average Weight (g)"
+            type: "line",
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: "linear",
+                        title: {
+                            display: true,
+                            text: "Days Since Stocking"
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: "Average Weight (g)"
+                        }
+                    }
                 }
             }
-            }
-        }
-    });
+        });
     }
     </script>
+
 {% else %}
   <p style="text-align:center; color:gray;">
     Select a pond to view its growth trend.

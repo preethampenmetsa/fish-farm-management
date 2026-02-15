@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'sampling',
     'calculator',
     'api',
+    'stock',
+    'mortality',
+    'feed',
 ]
 
 MIDDLEWARE = [
@@ -123,6 +126,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": 
         "rest_framework.pagination.PageNumberPagination",
@@ -132,7 +139,5 @@ REST_FRAMEWORK = {
 LOGIN_REDIRECT_URL = "/sampling/dashboard/"
 LOGOUT_REDIRECT_URL = "/accounts/login/"
 LOGIN_URL = "/accounts/login/"
-STATIC_URL = "static/"
-
 
 

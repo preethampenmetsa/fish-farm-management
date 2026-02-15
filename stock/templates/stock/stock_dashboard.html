@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Stock Dashboard</h2>
+
+<div style="margin-bottom:20px;">
+    <a href="{% url 'stock:pond-stock-list' %}">View All Stocks</a> |
+    <a href="{% url 'stock:add-pond-stock' %}">Add New Stock</a> |
+    <a href="{% url 'stock:pond-biomass' %}">Pond Biomass</a>
+</div>
+
+<hr>
+
+<h3>Summary</h3>
+
+<div style="display:flex; gap:40px; margin-bottom:30px;">
+    <div>
+        <strong>Active Stocks:</strong><br>
+        {{ total_active_stocks }}
+    </div>
+
+    <div>
+        <strong>Closed Stocks:</strong><br>
+        {{ total_closed_stocks }}
+    </div>
+
+    <div>
+        <strong>Total Alive Fish:</strong><br>
+        {{ total_alive_fish }}
+    </div>
+
+    <div>
+        <strong>Total Biomass (grams):</strong><br>
+        {{ total_biomass }}
+    </div>
+</div>
+
+<hr>
+
+<h3>Active Stock Details</h3>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Pond</th>
+            <th>Species</th>
+            <th>Initial Weight</th>
+            <th>Latest Avg Weight</th>
+            <th>Growth %</th>
+            <th>Alive Fish</th>
+            <th>Total Live Weight</th>
+            <th>Days Since Stocking</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stock in active_stocks %}
+        <tr>
+            <td>{{ stock.pond.name }}</td>
+            <td>{{ stock.species.name }}</td>
+            <td>{{ stock.initial_avg_weight }}</td>
+            <td>{{ stock.latest_average_weight }}</td>
+            <td>{{ stock.total_growth_percentage }}</td>
+            <td>{{ stock.alive_fish_count }}</td>
+            <td>{{ stock.total_live_weight }}</td>
+            <td>{{ stock.days_since_stocking }}</td>
+            <td>{{ stock.overall_growth_status }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9">No active stocks.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

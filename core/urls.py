@@ -1,10 +1,11 @@
+from core import views
 from django.urls import path
-from core.views import home,pond_list,create_pond,species_list,add_species
 
 urlpatterns = [
-    path("", home, name="home"),
-    path("ponds/", pond_list, name="pond-list"),
-    path("ponds/create/", create_pond, name="create-pond"),
-    path("species/", species_list, name="species-list"),
-    path("species/add/", add_species, name="add-species"),    
+    path("", views.home, name="home"),
+    path("ponds/", views.pond_list, name="pond-list"),
+    path("ponds/create/", views.create_pond, name="create-pond"),
+    path("species/", views.species_list, name="species-list"),
+    path("species/add/", views.add_species, name="add-species"), 
+    path("pond/<int:pond_id>/", views.pond_detail, name="pond-detail"),
 ]

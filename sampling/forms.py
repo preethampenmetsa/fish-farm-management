@@ -1,8 +1,8 @@
 from django import forms
-from core.models import FishSpecies
-from sampling.models import FishMortality, PondFishStock, FishSampling, Pond
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from stock.models import PondFishStock
+from sampling.models import FishSampling
+
 
 class SamplingForm(forms.Form):
 
@@ -26,6 +26,7 @@ class SamplingForm(forms.Form):
     sampled_on = forms.DateField(
         widget=forms.DateInput(attrs={"type": "date"})
     )
+
     batch_size = forms.IntegerField(
         min_value=1,
         help_text="Number of fish per batch (e.g. 5)"
@@ -33,7 +34,7 @@ class SamplingForm(forms.Form):
 
     batch_weights = forms.CharField(
         widget=forms.Textarea,
-        help_text="Enter one batch weight per line (e.g. 420)"
+        help_text="Enter one batch weight per line"
     )
 
     def clean_batch_weights(self):
@@ -67,11 +68,9 @@ class SamplingForm(forms.Form):
         fish_stock = cleaned_data.get("fish_stock")
         sampled_on = cleaned_data.get("sampled_on")
 
-        # If basic fields are missing, stop here
         if not fish_stock or not sampled_on:
             return cleaned_data
 
-        # Duplicate sampling check
         exists = FishSampling.objects.filter(
             fish_stock=fish_stock,
             sampled_on=sampled_on
@@ -79,62 +78,12 @@ class SamplingForm(forms.Form):
 
         if exists:
             raise ValidationError(
-                "A sampling for this fish stock already exists on this date."
+                "A sampling already exists on this date."
             )
 
-        # Sampling date sanity check
-        if fish_stock and sampled_on:
-            if sampled_on < fish_stock.stocked_on:
-                raise ValidationError(
-                    f"Sampling date cannot be before stocking date ({fish_stock.stocked_on})."
-                )
-            return cleaned_data
-
-
-class PondStockForm(forms.ModelForm):
-    class Meta:
-        model = PondFishStock
-        fields = [
-            "pond",
-            "species",
-            "quantity",
-            "initial_avg_weight",
-            "stocked_on",
-        ]
-        widgets = {
-            "stocked_on": forms.DateInput(attrs={"type": "date"}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop("user")
-        super().__init__(*args, **kwargs)
-
-        # 🔒 Ownership filtering
-        self.fields["pond"].queryset = Pond.objects.filter(user=self.user)
-
-        self.fields["species"].queryset = FishSpecies.objects.filter(
-            Q(user__isnull=True) | Q(user=self.user)
-        ).order_by("name")
-
-class FishMortalityForm(forms.ModelForm):
-    class Meta:
-        model = FishMortality
-        fields = ["fish_stock", 
-                  "date", 
-                  "dead_count", 
-                  "note"
-                  ]
-        widgets = {
-            "date": forms.DateInput(attrs={"type": "date"}),
-            "note": forms.Textarea
-
-        }
-
-    def __init__(self, *args, user=None, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        if user:
-            self.fields["fish_stock"].queryset = PondFishStock.objects.filter(
-                user=user,
-                status=PondFishStock.ACTIVE
+        if sampled_on < fish_stock.stocked_on:
+            raise ValidationError(
+                f"Sampling date cannot be before stocking date ({fish_stock.stocked_on})."
             )
+
+        return cleaned_data

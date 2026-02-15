@@ -3,15 +3,44 @@ from django.contrib.auth.decorators import login_required
 from core.forms import FishSpeciesForm, PondForm
 from core.models import FishSpecies, Pond
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 @login_required
 def home(request):
-    return render(request, "core/home.html")
+    ponds = Pond.objects.filter(user=request.user).prefetch_related("pondfishstock_set")
+
+    pond_data = []
+
+    for pond in ponds:
+        active_stocks = pond.pondfishstock_set.filter(status="ACTIVE")
+        pond_data.append({
+            "pond": pond,
+            "active_stock_count": active_stocks.count(),
+        })
+
+    return render(request, "core/home.html", {
+        "pond_data": pond_data
+    })
+
 
 @login_required
 def pond_list(request):
-    ponds = Pond.objects.filter(user=request.user)
-    return render(request, "core/pond_list.html", {"ponds": ponds})
+    ponds = Pond.objects.filter(user=request.user).prefetch_related("pondfishstock_set")
+
+    pond_data = []
+
+    for pond in ponds:
+        active_stocks = pond.pondfishstock_set.filter(status="ACTIVE").count()
+
+        pond_data.append({
+            "pond": pond,
+            "active_stock_count": active_stocks
+        })
+
+    return render(request, "core/pond_list.html", {
+        "pond_data": pond_data
+    })
+
 
 
 @login_required
@@ -58,5 +87,16 @@ def add_species(request):
         "core/add_species.html",
         {"form": form}
     )
+
+@login_required
+def pond_detail(request, pond_id):
+    pond = get_object_or_404(Pond, id=pond_id, user=request.user)
+
+    return render(
+        request,
+        "core/pond_detail.html",
+        {"pond": pond}
+    )
+
 
 

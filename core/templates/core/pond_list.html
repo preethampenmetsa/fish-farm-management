@@ -1,15 +1,33 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'core/css/pond_list.css' %}">
+{% endblock %}
 
 {% block content %}
-<h2>Your Ponds</h2>
+<h2>My Ponds</h2>
 
-<a href="{% url 'create-pond' %}">Add Pond</a>
+<div class="top-actions">
+    <a href="{% url 'create-pond' %}" class="btn-primary">Add Pond</a>
+</div>
 
-<ul>
-  {% for pond in ponds %}
-    <li>{{ pond.name }} — {{ pond.area_acres }} acres</li>
-  {% empty %}
-    <li>No ponds created yet</li>
-  {% endfor %}
-</ul>
+{% if pond_data %}
+    <div class="pond-grid">
+        {% for item in pond_data %}
+            <div class="pond-card">
+                <h3>{{ item.pond.name }}</h3>
+                <p>Area: {{ item.pond.area_acres }} acres</p>
+                <p>Active Stocks: {{ item.active_stock_count }}</p>
+
+                <a href="{% url 'pond-detail' item.pond.id %}" class="btn-secondary">
+                    Open Pond
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>No ponds yet.</p>
+{% endif %}
+
 {% endblock %}

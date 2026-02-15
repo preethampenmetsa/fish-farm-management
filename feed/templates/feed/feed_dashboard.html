@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Feed Dashboard</h2>
+
+<div>
+    <p><strong>Total Purchased:</strong> {{ total_purchased }} kg</p>
+    <p><strong>Total Used:</strong> {{ total_used }} kg</p>
+    <p><strong>Total Remaining:</strong> {{ total_remaining }} kg</p>
+</div>
+
+<hr>
+
+<h3>Feed Stock Summary</h3>
+
+<table border="1">
+    <tr>
+        <th>Pond</th>
+        <th>Feed Type</th>
+        <th>Purchased</th>
+        <th>Used</th>
+        <th>Remaining</th>
+    </tr>
+
+    {% for stock in stocks %}
+    <tr>
+        <td>{{ stock.pond.name }}</td>
+        <td>{{ stock.feed_type.name }}</td>
+        <td>{{ stock.purchased_quantity_kg }} kg</td>
+        <td>{{ stock.total_used }} kg</td>
+        <td>{{ stock.current_stock }} kg</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="5">No feed stock available.</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<br>
+<a href="{% url 'feed:add-feed-stock' %}">Add Feed Stock</a> |
+<a href="{% url 'feed:add-feed-usage' %}">Record Feed Usage</a> |
+<a href="{% url 'feed:feed-stock-list' %}">Feed Stock List</a> |
+<a href="{% url 'feed:feed-usage-list' %}">Feed Usage List</a> 
+
+{% endblock %}

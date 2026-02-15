@@ -1,0 +1,33 @@
+.pond-header {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    margin: 20px 0;
+}
+
+.action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.action-card {
+    display: block;
+    text-decoration: none;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+    color: #1f2937;
+}
+
+.action-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.action-card h4 {
+    margin-bottom: 8px;
+}

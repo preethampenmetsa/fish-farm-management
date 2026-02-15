@@ -4,13 +4,22 @@
 
 {% block content %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'sampling/pond_stock_list.css' %}">
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'stock/pond_stock_list.css' %}">
+{% endblock %}
+
+<div class="page-header">
+    <h2>Pond Stock</h2>
+    {% if selected_pond %}
+        <a href="{% url 'stock:add-pond-stock' %}?pond_id={{ selected_pond.id }}"
+           class="add-stock-btn">
+           + Add Stock
+        </a>
+    {% endif %}
+
+</div>
 
 <div class="stock-container">
-    <h2>Pond Stock</h2>
-
-    <a href="{% url 'add-pond-stock' %}">+ Add Pond Stock</a>
-
     <div class="stock-grid">
 
         {% for stock in stocks %}
@@ -51,7 +60,7 @@
             {% endwith %}
 
             {% if stock.status == "ACTIVE" %}
-            <form method="post" action="{% url 'close-pond-stock' stock.id %}">
+            <form method="post" action="{% url 'stock:close-pond-stock' stock.id %}">
                 {% csrf_token %}
                 <button type="submit" class="close-btn">Close Stock</button>
             </form>

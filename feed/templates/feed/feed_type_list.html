@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Feed Types{% endblock %}
+
+{% block content %}
+<h2>Feed Types</h2>
+
+<a href="{% url 'feed:add-feed-type' %}">Add Feed Type</a>
+
+<ul>
+    {% for feed in feed_types %}
+        <li>
+            {{ feed.name }} {% if feed.brand %} ({{ feed.brand }}) {% endif %}
+        </li>
+    {% empty %}
+        <li>No feed types added yet.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

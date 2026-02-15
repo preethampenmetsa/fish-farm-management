@@ -39,3 +39,5 @@ class FishSamplingAdmin(admin.ModelAdmin):
         return obj.growth_percentage
 
     growth_percentage_display.short_description = "Growth (%)"
+
+

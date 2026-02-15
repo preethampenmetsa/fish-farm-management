@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'sampling/biomass.css' %}">
+<link rel="stylesheet" href="{% static 'stock/biomass.css' %}">
 {% endblock %}
 
 <h2>Pond Biomass Dashboard</h2>
@@ -39,7 +39,7 @@
             {{ biomass.total_biomass|floatformat:0|intcomma }} g
         </p>
         <p class="sub-number">
-            ({{ biomass.total_biomass_tons }} tons)
+            ({{ biomass.total_biomass_tons }} tonnes)
         </p>
     </div>
 
@@ -66,7 +66,7 @@
             <strong>Biomass:</strong><br>
             {{ data.total_weight|floatformat:0|intcomma }} g<br>
             <span class="sub-number">
-                ({{ data.total_weight_tons }} tons)
+                ({{ data.total_weight_tons }} tonnes)
             </span>
         </p>
     </div>
