@@ -8,4 +8,6 @@ urlpatterns = [
     path("species/", views.species_list, name="species-list"),
     path("species/add/", views.add_species, name="add-species"), 
     path("pond/<int:pond_id>/", views.pond_detail, name="pond-detail"),
+    path("register/", views.register, name="register"),
+
 ]
