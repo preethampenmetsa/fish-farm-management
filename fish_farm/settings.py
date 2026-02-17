@@ -30,7 +30,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG") == "True"
 
-ALLOWED_HOSTS = ["* "]
+ALLOWED_HOSTS = ["fish-farm-management.onrender.com"]
+CSRF_TRUSTED_ORIGINS = ["https://fish-farm-management.onrender.com"]
+
 
 
 # Application definition
