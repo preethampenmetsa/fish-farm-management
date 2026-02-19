@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 
+from core.models import Pond
 from feed.forms import FeedTypeForm, FeedUsageForm, PondFeedStockForm
 from feed.models import FeedType, FeedUsageLog, PondFeedStock
 from feed.services import record_feed_usage
@@ -99,10 +100,12 @@ def feed_usage_list(request):
     )
 
 @login_required
-def feed_dashboard(request):
+def feed_dashboard(request, pond_id):
+    pond = get_object_or_404(Pond, id=pond_id, user=request.user)
+
     stocks = (
         PondFeedStock.objects
-        .filter(user=request.user)
+        .filter(user=request.user, pond=pond)
         .select_related("pond", "feed_type")
     )
 
@@ -111,6 +114,7 @@ def feed_dashboard(request):
     total_remaining = sum(s.current_stock() for s in stocks)
 
     context = {
+        "pond": pond,
         "stocks": stocks,
         "total_purchased": total_purchased,
         "total_used": total_used,
@@ -118,6 +122,7 @@ def feed_dashboard(request):
     }
 
     return render(request, "feed/feed_dashboard.html", context)
+
 
 
 

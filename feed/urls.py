@@ -4,7 +4,7 @@ from . import views
 app_name = "feed"
 
 urlpatterns = [
-    path("", views.feed_dashboard, name="feed-dashboard"),
+    path("<int:pond_id>/", views.feed_dashboard, name="feed-dashboard"),
     path("stock/add/", views.add_feed_stock, name="add-feed-stock"),
     path("stock/", views.feed_stock_list, name="feed-stock-list"),
     path("usage/add/", views.add_feed_usage, name="add-feed-usage"),

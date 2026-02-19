@@ -34,6 +34,11 @@
         <p>Track growth trends and sampling logs</p>
     </a>
 
+    <a class="action-card" href="{% url 'feed:feed-dashboard' %}?pond_id={{ pond.id }}">
+        <h4>Feed Usage Dashboard</h4>
+        <p>View all the feeds related things header</p>
+    </a>
+
     <a class="action-card" href="{% url 'mortality:add-mortality' %}?pond_id={{ pond.id }}">
         <h4>Add Mortality</h4>
         <p>Log dead fish entries</p>
