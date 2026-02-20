@@ -34,7 +34,7 @@
         <p>Track growth trends and sampling logs</p>
     </a>
 
-    <a class="action-card" href="{% url 'feed:feed-dashboard' %}?pond_id={{ pond.id }}">
+    <a class="action-card" href="{% url 'feed:feed-dashboard' pond.id %}">
         <h4>Feed Usage Dashboard</h4>
         <p>View all the feeds related things header</p>
     </a>
